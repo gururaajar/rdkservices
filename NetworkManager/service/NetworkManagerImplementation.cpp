@@ -567,7 +567,7 @@ namespace WPEFramework
 #ifdef ENABLE_LEGACY_NSM_SUPPORT
                 callback->onWiFiSignalStrengthChanged(ssid, signalLevel, signalQuality);
 #else
-                callback->onWiFiSignalStrengthChanged(ssid, signalLevel, signalQuality);
+                callback->onWiFiSignalStrengthChange(ssid, signalLevel, signalQuality);
 #endif
                 NMLOG_INFO("We have %d subscribed clients to trigger notifications", (int) _notificationCallbacks.size());
             }

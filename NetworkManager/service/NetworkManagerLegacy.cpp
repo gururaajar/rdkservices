@@ -64,6 +64,7 @@ namespace WPEFramework
             Register("isPaired",                          &NetworkManager::isPaired, this);
             Register("saveSSID",                          &NetworkManager::AddToKnownSSIDs, this);
             Register("getSupportedSecurityModes",         &NetworkManager::GetSupportedSecurityModes, this);
+            Register("getCurrentState",                   &NetworkManager::getCurrentState, this);
         }
 
         /**
@@ -99,6 +100,7 @@ namespace WPEFramework
             Unregister("isPaired");
             Unregister("saveSSID");
             Unregister("getSupportedSecurityModes");
+            Unregister("getCurrentState");
         }
 
 #define CIDR_NETMASK_IP_LEN 32
@@ -449,6 +451,23 @@ const string CIDR_PREFIXES[CIDR_NETMASK_IP_LEN] = {
                 {
                     response["result"] = 0;
                 }
+                response["success"] = true;
+            }
+            return rc;
+        }
+
+        uint32_t NetworkManager::getCurrentState (const JsonObject& parameters, JsonObject& response)
+        {
+            uint32_t rc = Core::ERROR_GENERAL;
+            uint32_t state;
+
+            if (_NetworkManager)
+                rc = _NetworkManager->GetCurrentState(state);
+            else
+                rc = Core::ERROR_UNAVAILABLE;
+            if (Core::ERROR_NONE == rc)
+            {
+                response["state"] = state;
                 response["success"] = true;
             }
             return rc;

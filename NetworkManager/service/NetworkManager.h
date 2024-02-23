@@ -474,6 +474,7 @@ namespace WPEFramework
             uint32_t getSupportedSecurityModes(const JsonObject& parameters, JsonObject& response);
             uint32_t startScan(const JsonObject& parameters, JsonObject& response);
             uint32_t stopScan(const JsonObject& parameters, JsonObject& response);
+            uint32_t getCurrentState(const JsonObject& parameters, JsonObject& response);
 #endif
         private:
             uint32_t _connectionId;
