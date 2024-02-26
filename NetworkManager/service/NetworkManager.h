@@ -203,16 +203,14 @@ namespace WPEFramework
 #ifdef ENABLE_LEGACY_NSM_SUPPORT
                     string oldInterface;
                     string newInterface;
-                    if(prevActiveInterface.c_str() == "wlan0" && currentActiveinterface.c_str() == "eth0")
-                    {
+                    if(prevActiveInterface.c_str() == "wlan0")
                         oldInterface = "WIFI";
-                        newInterface = "ETHERNET";
-                    }
-                    else if(prevActiveInterface.c_str() == "eth0" && currentActiveinterface.c_str() == "wlan0")
-                    {
+                    else if(prevActiveInterface.c_str() == "eth0")
                         oldInterface = "ETHERNET";
+                    if(currentActiveinterface.c_str() == "wlan0")
                         newInterface = "WIFI";
-                    }
+                    else if(currentActiveinterface.c_str() == "eth0")
+                        newInterface = "ETHERNET";
                     legacyParams["oldInterfaceName"] = oldInterface;
                     legacyParams["newInterfaceName"] = newInterface;
                     _parent.Notify("onDefaultInterfaceChanged", legacyParams);
