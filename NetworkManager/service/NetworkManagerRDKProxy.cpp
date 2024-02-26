@@ -467,7 +467,7 @@ namespace WPEFramework
                         NMLOG_INFO("Event IARM_BUS_WIFI_MGR_EVENT_onWIFIStateChanged received; state=%d", e->data.wifiStateChange.state);
 
                         state = to_wifi_state(e->data.wifiStateChange.state);
-                        if(state == WIFI_CONNECTED)
+                        if(e->data.wifiStateChange.state == WIFI_CONNECTED)
                             WifiSignalStrengthMonitor::getInstance()->startWifiSignalStrengthMonitor(DEFAULT_WIFI_SIGNAL_TEST_INTERVAL_SEC);
                         ::_instance->ReportWiFiStateChangedEvent(state);
                         break;
@@ -1130,7 +1130,7 @@ const string CIDR_PREFIXES[CIDR_NETMASK_IP_LEN] = {
             return rc;
         }
 
-        uint32_t NetworkManagerImplementation::GetCurrentState(const uint32_t &state)
+        uint32_t NetworkManagerImplementation::GetCurrentState(uint32_t &state)
         {
             LOG_ENTRY_FUNCTION();
             uint32_t rc = Core::ERROR_RPC_CALL_FAILED;
