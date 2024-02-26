@@ -124,9 +124,9 @@ namespace WPEFramework
                     JsonObject legacyParams;
                     JsonObject onConnParams;
 #ifdef ENABLE_LEGACY_NSM_SUPPORT
-                    if(interface.c_str() == "wlan0")
+                    if(interface == "wlan0")
                         legacyParams["interface"] = "WIFI";
-                    else if(interface.c_str() == "eth0")
+                    else if(interface == "eth0")
                         legacyParams["interface"] = "ETHERNET";
                     if(event == INTERFACE_ADDED)
                         legacyParams["enabled"] = true;
@@ -172,9 +172,9 @@ namespace WPEFramework
                         legacyParams["ip4address"] = ipAddress;
                         legacyParams["ip6address"] = "";
                     }
-                    if(interface.c_str() == "wlan0")
+                    if(interface == "wlan0")
                         legacyParams["interface"] = "WIFI";
-                    else if(interface.c_str() == "eth0")
+                    else if(interface == "eth0")
                         legacyParams["interface"] = "ETHERNET";
                     _parent.Notify("onIPAddressStatusChanged", legacyParams);
 #endif
@@ -203,13 +203,13 @@ namespace WPEFramework
 #ifdef ENABLE_LEGACY_NSM_SUPPORT
                     string oldInterface;
                     string newInterface;
-                    if(prevActiveInterface.c_str() == "wlan0")
+                    if(prevActiveInterface == "wlan0")
                         oldInterface = "WIFI";
-                    else if(prevActiveInterface.c_str() == "eth0")
+                    else if(prevActiveInterface == "eth0")
                         oldInterface = "ETHERNET";
-                    if(currentActiveinterface.c_str() == "wlan0")
+                    if(currentActiveinterface == "wlan0")
                         newInterface = "WIFI";
-                    else if(currentActiveinterface.c_str() == "eth0")
+                    else if(currentActivee == "eth0")
                         newInterface = "ETHERNET";
                     legacyParams["oldInterfaceName"] = oldInterface;
                     legacyParams["newInterfaceName"] = newInterface;
@@ -238,7 +238,7 @@ namespace WPEFramework
 #ifdef ENABLE_LEGACY_NSM_SUPPORT
                     legacyParams["state"] = static_cast <int> (newstate);;
                     legacyParams["status"] = InternetStatusToString(newstate);
-                    _parent.Notify("onInternetStatusChange", legacyParams);
+                    _parent.Notify("onInternetStatusChanged", legacyParams);
 #endif
                     params["state"] = static_cast <int> (newstate);;
                     params["status"] = InternetStatusToString(newstate);
@@ -301,7 +301,7 @@ namespace WPEFramework
                     NMLOG_TRACE("%s", __FUNCTION__);
                     JsonObject result;
                     result["state"] = static_cast <int> (state);
-                    _parent.Notify("onWiFiStateChanged", result);
+                    _parent.Notify("onWiFiStateChange", result);
                 }
                 void onWiFiSignalStrengthChanged(const string ssid, const string signalLevel, const Exchange::INetworkManager::WiFiSignalQuality signalQuality) override
                 {
@@ -325,10 +325,8 @@ namespace WPEFramework
                     result["ssid"] = ssid;
                     result["signalLevel"] = signalLevel;
                     result["signalQuality"] = WiFiSignalQualityToString(signalQuality);
-                    _parent.Notify("onWiFiSignalStrengthChanged", result);
+                    _parent.Notify("onWiFiSignalStrengthChange", result);
                 }
-
-
 
                 // The activated/deactived methods are part of the RPC::IRemoteConnection::INotification
                 // interface. These are triggered when Thunder detects a connection/disconnection over the
