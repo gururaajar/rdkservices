@@ -209,7 +209,7 @@ namespace WPEFramework
                         oldInterface = "ETHERNET";
                     if(currentActiveinterface == "wlan0")
                         newInterface = "WIFI";
-                    else if(currentActivee == "eth0")
+                    else if(currentActiveinterface == "eth0")
                         newInterface = "ETHERNET";
                     legacyParams["oldInterfaceName"] = oldInterface;
                     legacyParams["newInterfaceName"] = newInterface;
