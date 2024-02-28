@@ -28,6 +28,7 @@
 
 // TODO: remove this
 #define registerMethod(...) for (uint8_t i = 1; GetHandler(i); i++) GetHandler(i)->Register<JsonObject, JsonObject>(__VA_ARGS__)
+#define LOGINFOMETHODEVENTS() { std::string json; params.ToString(json); LOGINFO("params=%s", json.c_str() ); }
 
 #define API_VERSION_NUMBER_MAJOR 1
 #define API_VERSION_NUMBER_MINOR 0
@@ -139,8 +140,9 @@ namespace WPEFramework
 
         uint32_t WifiManager::getCurrentState(const JsonObject &parameters, JsonObject &response)
         {
+            LOGINFOMETHOD();
             uint32_t result = wifiState.getCurrentState(parameters, response);
-
+            LOGTRACEMETHODFIN();
             return result;
         }
 
@@ -166,20 +168,24 @@ namespace WPEFramework
 
         uint32_t WifiManager::getConnectedSSID(const JsonObject &parameters, JsonObject &response)
         {
+            LOGINFOMETHOD();
             uint32_t result = wifiState.getConnectedSSID(parameters, response);
 
+            LOGTRACEMETHODFIN();
             return result;
         }
 
         uint32_t WifiManager::setEnabled(const JsonObject &parameters, JsonObject &response)
         {
+            LOGINFOMETHOD();
             uint32_t result = wifiState.setEnabled(parameters, response);
-
+            LOGTRACEMETHODFIN();
             return result;
         }
 
         uint32_t WifiManager::connect(const JsonObject &parameters, JsonObject &response)
         {
+            LOGINFOMETHOD();
             uint32_t result = wifiConnect.connect(parameters, response);
 
             LOGTRACEMETHODFIN();
@@ -198,78 +204,89 @@ namespace WPEFramework
 
         uint32_t WifiManager::initiateWPSPairing(const JsonObject &parameters, JsonObject &response)
         {
+            LOGINFOMETHOD();
             uint32_t result = wifiWPS.initiateWPSPairing(parameters, response);
-
+            LOGTRACEMETHODFIN();
             return result;
         }
 
         uint32_t WifiManager::initiateWPSPairing2(const JsonObject &parameters, JsonObject &response)
         {
+            LOGINFOMETHOD();
             uint32_t result = wifiWPS.initiateWPSPairing2(parameters, response);
-
+            LOGTRACEMETHODFIN();
             return result;
         }
 
         uint32_t WifiManager::cancelWPSPairing(const JsonObject &parameters, JsonObject &response)
         {
+            LOGINFOMETHOD();
             uint32_t result = wifiWPS.cancelWPSPairing(parameters, response);
-
+            LOGTRACEMETHODFIN();
             return result;
         }
 
         uint32_t WifiManager::saveSSID(const JsonObject &parameters, JsonObject &response)
         {
+            LOGINFOMETHOD();
             uint32_t result = wifiWPS.saveSSID(parameters, response);
-
+            LOGTRACEMETHODFIN();
             return result;
         }
 
         uint32_t WifiManager::clearSSID(const JsonObject &parameters, JsonObject &response)
         {
+            LOGINFOMETHOD();
             uint32_t result = wifiWPS.clearSSID(parameters, response);
-
+            LOGTRACEMETHODFIN();
             return result;
         }
 
         uint32_t WifiManager::getPairedSSID(const JsonObject &parameters, JsonObject &response)
         {
+            LOGINFOMETHOD();
             uint32_t result = wifiWPS.getPairedSSID(parameters, response);
-
+            LOGTRACEMETHODFIN();
             return result;
         }
 
         uint32_t WifiManager::getPairedSSIDInfo(const JsonObject &parameters, JsonObject &response)
         {
+            LOGINFOMETHOD();
             uint32_t result = wifiWPS.getPairedSSIDInfo(parameters, response);
-
+            LOGTRACEMETHODFIN();
             return result;
         }
 
         uint32_t WifiManager::isPaired(const JsonObject &parameters, JsonObject &response)
         {
+            LOGINFOMETHOD();
             uint32_t result = wifiWPS.isPaired(parameters, response);
-
+            LOGTRACEMETHODFIN();
             return result;
         }
 
         uint32_t WifiManager::setSignalThresholdChangeEnabled(const JsonObject &parameters, JsonObject &response)
         {
+            LOGINFOMETHOD();
             uint32_t result = wifiSignalThreshold.setSignalThresholdChangeEnabled(parameters, response);
-
+            LOGTRACEMETHODFIN();
             return result;
         }
 
         uint32_t WifiManager::isSignalThresholdChangeEnabled(const JsonObject &parameters, JsonObject &response) const
         {
+            LOGINFOMETHOD();
             uint32_t result = wifiSignalThreshold.isSignalThresholdChangeEnabled(parameters, response);
-
+            LOGTRACEMETHODFIN();
             return result;
         }
 
         uint32_t WifiManager::getSupportedSecurityModes(const JsonObject &parameters, JsonObject &response)
         {
+            LOGINFOMETHOD();
             uint32_t result = wifiState.getSupportedSecurityModes(parameters, response);
-
+            LOGTRACEMETHODFIN();
             return result;
         }
 
@@ -289,6 +306,7 @@ namespace WPEFramework
                 wifiState.setWifiStateCache(true, state);
                 wifiWPS.updateWifiWPSCache(false);
             }
+            LOGINFOMETHODEVENTS();
             sendNotify("onWIFIStateChanged", params);
             if (state == WifiState::CONNECTED)
             {
@@ -309,12 +327,14 @@ namespace WPEFramework
         {
             JsonObject params;
             params["code"] = static_cast<int>(code);
+            LOGINFOMETHODEVENTS();
             sendNotify("onError", params);
         }
 
         void WifiManager::onSSIDsChanged()
         {
             wifiWPS.updateWifiWPSCache(false);
+            LOG_INFO("onSSIDsChanged Event called\n");    
             sendNotify("onSSIDsChanged", JsonObject());
         }
 
@@ -323,6 +343,7 @@ namespace WPEFramework
             JsonObject params;
             params["signalStrength"] = std::to_string(signalStrength);
             params["strength"] = strength;
+            LOGINFOMETHODEVENTS();
             Notify("onWifiSignalThresholdChanged", params);
         }
 
@@ -336,6 +357,9 @@ namespace WPEFramework
          */
         void WifiManager::onAvailableSSIDs(JsonObject const& ssids)
         {
+            std::string json; 
+            ssids.ToString(json); 
+            LOGINFO("onAvailableSSIDs params=%s", json.c_str());
             sendNotify("onAvailableSSIDs", ssids);
         }
 

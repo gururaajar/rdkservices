@@ -60,6 +60,8 @@ using namespace std;
 // TODO: remove this
 #define registerMethod(...) for (uint8_t i = 1; GetHandler(i); i++) GetHandler(i)->Register<JsonObject, JsonObject>(__VA_ARGS__)
 
+#define LOGINFOMETHODEVENTS() { std::string json; params.ToString(json); LOGINFO("params=%s", json.c_str() ); }
+
 namespace WPEFramework
 {
 
@@ -360,6 +362,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
         uint32_t Network::getQuirks(const JsonObject& parameters, JsonObject& response)
         {
             JsonArray array;
+            LOGINFOMETHOD();
             array.Add("RDK-20093");
             response["quirks"] = array;
             returnResponse(true)
@@ -370,6 +373,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             IARM_BUS_NetSrvMgr_InterfaceList_t list;
             bool result = false;
 
+            LOGINFOMETHOD();
             if(m_isPluginInited)
             {
                 if (IARM_RESULT_SUCCESS == IARM_Bus_Call(IARM_BUS_NM_SRV_MGR_NAME, IARM_BUS_NETSRVMGR_API_getInterfaceList, (void*)&list, sizeof(list)))
@@ -405,6 +409,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
                 LOGWARN ("Network plugin not initialised yet returning from %s", __FUNCTION__);
             }
 
+            LOGTRACEMETHODFIN();
             returnResponse(result)
         }
 
@@ -413,6 +418,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             string interface;
             string gateway;
 
+            LOGINFOMETHOD();
             bool result = false;
             if(m_isPluginInited)
             {
@@ -434,6 +440,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
                 LOGWARN ("Network plugin not initialised yet returning from %s", __FUNCTION__);
             }
 
+            LOGTRACEMETHODFIN();
             returnResponse(result)
         }
 
@@ -441,6 +448,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
         {
             bool result = false;
 
+            LOGINFOMETHOD();
             if(m_isPluginInited)
             {
                 if ((parameters.HasLabel("interface")) && (parameters.HasLabel("persist")))
@@ -474,6 +482,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
                 LOGWARN ("Network plugin not initialised yet returning from %s", __FUNCTION__);
             }
 
+            LOGTRACEMETHODFIN();
             returnResponse(result)
         }
 
@@ -482,6 +491,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             IARM_BUS_NetSrvMgr_Iface_EventData_t param;
             memset(&param, 0, sizeof(param));
 
+            LOGINFOMETHOD();
             bool result = false;
 
             if(m_isPluginInited)
@@ -511,6 +521,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
                 LOGWARN ("Network plugin not initialised yet returning from %s", __FUNCTION__);
             }
 
+            LOGTRACEMETHODFIN();
             returnResponse(result)
         }
 
@@ -518,6 +529,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
         {
             bool result = false;
 
+            LOGINFOMETHOD();
             if(m_isPluginInited)
             {
                 if (parameters.HasLabel("family"))
@@ -552,13 +564,15 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
                 LOGWARN ("Network plugin not initialised yet returning from %s", __FUNCTION__);
             }
 
+            LOGTRACEMETHODFIN();
             returnResponse(result)
         }
         
         uint32_t Network::isInterfaceEnabled (const JsonObject& parameters, JsonObject& response)
         {
             bool result = false;
-
+            LOGINFOMETHOD();
+            
             if(m_isPluginInited)
             {
                 if (parameters.HasLabel("interface"))
@@ -590,6 +604,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
                 LOGWARN ("Network plugin not initialised yet returning from %s", __FUNCTION__);
             }
 
+            LOGTRACEMETHODFIN();
             returnResponse(result)
         }
 
@@ -597,6 +612,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
         {
             bool result = false;
 
+            LOGINFOMETHOD();
             if(m_isPluginInited)
             {
                 if ((parameters.HasLabel("interface")) && (parameters.HasLabel("enabled")) && (parameters.HasLabel("persist")))
@@ -632,6 +648,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
                 LOGWARN ("Network plugin not initialised yet returning from %s", __FUNCTION__);
             }
 
+            LOGTRACEMETHODFIN();
             returnResponse(result)
         }
 
@@ -640,7 +657,9 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             JsonArray namedEndpoints;
             namedEndpoints.Add("CMTS");
 
+            LOGINFOMETHOD();
             response["endpoints"] = namedEndpoints;
+            LOGTRACEMETHODFIN();
             returnResponse(true)
         }
 
@@ -648,6 +667,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
         {
             bool result = false;
 
+            LOGINFOMETHOD();
             if(m_isPluginInited)
             {
                 if (!parameters.HasLabel("endpoint"))
@@ -672,6 +692,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
                 LOGWARN ("Network plugin not initialised yet returning from %s", __FUNCTION__);
             }
 
+            LOGTRACEMETHODFIN();
             returnResponse(result)
         }
 
@@ -679,6 +700,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
         {
             bool result = false;
 
+            LOGINFOMETHOD();
             if(m_isPluginInited)
             {
                 if (!parameters.HasLabel("endpointName"))
@@ -703,6 +725,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
                 LOGWARN ("Network plugin not initialised yet returning from %s", __FUNCTION__);
             }
 
+            LOGTRACEMETHODFIN();
             returnResponse(result)
         }
 
@@ -711,6 +734,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             string guid;
             getStringParameter("guid", guid)
 
+            LOGINFOMETHOD();
                 uint32_t packets;
             getDefaultNumberParameter("packets", packets, DEFAULT_PING_PACKETS);
 
@@ -734,6 +758,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             {
                 LOGWARN ("Network plugin not initialised yet returning from %s", __FUNCTION__);
             }
+            LOGTRACEMETHODFIN();
             returnResponse(result)
         }
 
@@ -742,6 +767,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             string guid;
             getStringParameter("guid", guid)
 
+            LOGINFOMETHOD();
             uint32_t packets;
             getDefaultNumberParameter("packets", packets, DEFAULT_PING_PACKETS);
 
@@ -767,17 +793,21 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
                 LOGWARN ("Network plugin not initialised yet returning from %s", __FUNCTION__);
             }
 
+            LOGTRACEMETHODFIN();
             returnResponse(result)
         }
 
         uint32_t Network::setIPSettings(const JsonObject& parameters, JsonObject& response)
         {
             bool result = false;
+
+            LOGINFOMETHOD();
             if(m_isPluginInited)
                 return  setIPSettingsInternal(parameters, response);
             else
                 LOGWARN ("Network plugin not initialised yet returning from %s", __FUNCTION__);
 
+            LOGTRACEMETHODFIN();
             returnResponse(result)
         }
 
@@ -794,6 +824,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             bool autoconfig = true;
             bool result = false;
 
+            LOGINFOMETHOD();
             if(m_isPluginInited)
             {
                 getDefaultStringParameter("interface", interface, "");
@@ -819,6 +850,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             {
                 LOGWARN ("Network plugin not initialised yet returning from %s", __FUNCTION__);
             }
+            LOGTRACEMETHODFIN();
             returnResponse(result)
         }
 
@@ -828,6 +860,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             struct in_addr ip_address, gateway_address, mask;
             struct in_addr broadcast_addr1, broadcast_addr2;
 
+            LOGINFOMETHOD();
             if ((parameters.HasLabel("interface")) && (parameters.HasLabel("ipversion")) && (parameters.HasLabel("autoconfig")) &&
                 (parameters.HasLabel("ipaddr")) && (parameters.HasLabel("netmask")) && (parameters.HasLabel("gateway")) &&
                 (parameters.HasLabel("primarydns")) && (parameters.HasLabel("secondarydns")))
@@ -936,6 +969,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
                      response["supported"] = iarmData.isSupported;
             }
 
+            LOGTRACEMETHODFIN();
             returnResponse(result)
         }
 
@@ -947,6 +981,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             bool result = false;
             string interface = "";
             string ipversion = "";
+            LOGINFOMETHOD();
             if(m_isPluginInited)
             {
                 getDefaultStringParameter("interface", interface,"");
@@ -975,6 +1010,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
                 LOGWARN ("Network plugin not initialised yet returning from %s", __FUNCTION__);
             }
 
+            LOGTRACEMETHODFIN();
             returnResponse(result)
         }
 
@@ -986,6 +1022,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             bool result = false;
             string interface = "";
             string ipversion = "";
+            LOGINFOMETHOD();
             if(m_isPluginInited)
             {
                 getDefaultStringParameter("interface", interface, "");
@@ -1031,6 +1068,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
                 LOGWARN ("Network plugin not initialised yet returning from %s", __FUNCTION__);
             }
 
+            LOGTRACEMETHODFIN();
             returnResponse(result)
         }
 
@@ -1051,6 +1089,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             string ipversion = "";
             bool result = false;
 
+            LOGINFOMETHOD();
             getStringParameter("interface", interface);
             getStringParameter("ipversion", ipversion);
             if (interface.empty())
@@ -1128,6 +1167,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
 
                 m_ipversion = string(iarmData.ipversion);
             }
+            LOGTRACEMETHODFIN();
             return result;
         }
 
@@ -1154,6 +1194,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             bool isconnected = false;
             std::string ipversionStr;
             nsm_ipversion ipversion = NSM_IPRESOLVE_WHATEVER;
+            LOGINFOMETHOD();
 
             if(m_isPluginInited)
             {
@@ -1187,6 +1228,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
         uint32_t Network::setConnectivityTestEndpoints (const JsonObject &parameters, JsonObject &response)
         {
             bool result = false;
+            LOGINFOMETHOD();
 
             if(m_isPluginInited)
             {
@@ -1228,6 +1270,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             bool result = false;
             std::string ipversionStr;
             nsm_internetState internetState = NO_INTERNET;
+            LOGINFOMETHOD();
 
             if(m_isPluginInited)
             {
@@ -1267,7 +1310,8 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
         uint32_t Network::getCaptivePortalURI(const JsonObject& parameters, JsonObject& response)
         {
             bool result = true;
-
+            LOGINFOMETHOD();
+    
             if(m_isPluginInited)
             {
                 response["URI"] = connectivityMonitor.getCaptivePortalURI();
@@ -1283,6 +1327,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
         uint32_t Network::startConnectivityMonitoring(const JsonObject& parameters, JsonObject& response)
         {
             bool result = false;
+            LOGINFOMETHOD();
             if (parameters.HasLabel("interval"))
             {
                 result = connectivityMonitor.doContinuousConnectivityMonitoring(parameters["interval"].Number());
@@ -1297,6 +1342,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
 
         uint32_t Network::stopConnectivityMonitoring(const JsonObject& parameters, JsonObject& response)
         {
+            LOGINFOMETHOD();
             bool result = connectivityMonitor.stopContinuousConnectivityMonitoring();
             returnResponse(result);
         }
@@ -1310,6 +1356,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             internal ["cache_timeout"] = m_stunCacheTimeout;
             internal ["sync"] = m_stunSync;
 
+            LOGINFOMETHOD();
             if (parameters.HasLabel("iface"))
                 internal ["iface"] = parameters["iface"];
 
@@ -1321,6 +1368,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
 
         uint32_t Network::setStunEndPoint(const JsonObject& parameters, JsonObject& response)
         {
+            LOGINFOMETHOD();
             getDefaultStringParameter("server", m_stunEndPoint, "stun.l.google.com");
             getDefaultNumberParameter("port", m_stunPort, 19302);
             getDefaultBoolParameter("sync", m_stunSync, true);
@@ -1333,6 +1381,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
         uint32_t Network::configurePNI(const JsonObject& parameters, JsonObject& response)
         {
             bool result = false;
+            LOGINFOMETHOD();
             IARM_BUS_NetSrvMgr_configurePNI_t pniConfig = {0};
             if(m_isPluginInited)
             {
@@ -1360,6 +1409,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
         {
             bool result = false;
 
+            LOGINFOMETHOD();
             IARM_BUS_NetSrvMgr_Iface_StunRequest_t iarmData = { 0 };
             string server, iface;
 
@@ -1442,6 +1492,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             JsonObject params;
             params["interface"] = m_netUtils.getInterfaceDescription(interface);
             params["enabled"] = enabled;
+            LOGINFOMETHODEVENTS();
             sendNotify("onInterfaceStatusChanged", params);
             connectivityMonitor.signalConnectivityMonitor();
         }
@@ -1458,6 +1509,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             m_defIpversionCache = "";
             m_defInterfaceCache = "";
 
+            LOGINFOMETHODEVENTS();
             sendNotify("onConnectionStatusChanged", params);
             if(connected)
             {
@@ -1499,6 +1551,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
                     return;
                 break;
             }
+            LOGINFOMETHODEVENTS();
             sendNotify("onInternetStatusChange", params);
         }
 
@@ -1518,6 +1571,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
                 m_useIpv4Cache = false;
             }
             params["status"] = string (acquired ? "ACQUIRED" : "LOST");
+            LOGINFOMETHODEVENTS();
             sendNotify("onIPAddressStatusChanged", params);
             connectivityMonitor.signalConnectivityMonitor();
         }
@@ -1535,6 +1589,7 @@ typedef struct _IARM_BUS_NetSrvMgr_Iface_EventData_t {
             m_defaultInterface = ""; /* REFPLTV-1319 : Resetting when there is switch in interface, to get new value in getDefaultInterface() */
             m_gatewayInterface = "";
             m_defInterfaceCache = m_netUtils.getInterfaceDescription(newInterface);
+            LOGINFOMETHODEVENTS();
             sendNotify("onDefaultInterfaceChanged", params);
             connectivityMonitor.signalConnectivityMonitor();
         }
