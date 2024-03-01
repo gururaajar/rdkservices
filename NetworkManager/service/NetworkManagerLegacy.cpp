@@ -518,7 +518,8 @@ const string CIDR_PREFIXES[CIDR_NETMASK_IP_LEN] = {
                 rc = Core::ERROR_UNAVAILABLE;
             if (Core::ERROR_NONE == rc)
             {
-                response["state"] = state;
+                response["state"] = 2;
+                NMLOG_TRACE("Hard coding the state as 0 in Legacy.cpp\n");
                 response["success"] = true;
             }
             LOGTRACEMETHODFIN();

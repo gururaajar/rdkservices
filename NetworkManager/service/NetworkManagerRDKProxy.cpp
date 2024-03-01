@@ -1144,6 +1144,7 @@ const string CIDR_PREFIXES[CIDR_NETMASK_IP_LEN] = {
                 wifiState = to_wifi_state(param.data.wifiStatus);
                 //state = static_cast<int>(wifiState);
                 state = 2;
+                NMLOG_INFO ("Hard coding value in RDKproxy as zero = %d\n", state);
                 rc = Core::ERROR_NONE;
             }
             return rc;
