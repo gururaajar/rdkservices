@@ -105,6 +105,6 @@ write_config()
 
 if(ENABLE_LEGACY_NSM_SUPPORT)
 add_definitions(-DENABLE_LEGACY_NSM_SUPPORT)
-write_config(Network)
+#write_config(Network)
 write_config(WiFiManager)
 endif ()
