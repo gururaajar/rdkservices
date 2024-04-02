@@ -322,6 +322,7 @@ namespace WPEFramework
             string output{};
             char buffer[1024];
             JsonObject pingResult;
+            int exitStatus;
 
             pipe = popen(commandToExecute.c_str(), "r");
             if (pipe == NULL)
@@ -332,15 +333,9 @@ namespace WPEFramework
 
             if (NETMGR_PING == event)
             {
-                if(fgets(buffer, 1024, pipe) == NULL)
+                while (!feof(pipe) && fgets(buffer, 1024, pipe) != NULL)
                 {
-                    pingResult["success"] = false;
-                    pingResult["error"] = "Could not ping endpoint";
-                    NMLOG_INFO ("------------- GURU buffer content in IF %s\n -------------", buffer);
-                }
-                else
-                { 
-                    while (!feof(pipe) && fgets(buffer, 1024, pipe) != NULL)
+                    if(fgets(buffer, 1024, pipe) != NULL)
                     {
                         NMLOG_INFO ("------------- GURU buffer content in ELSE %s\n -------------", buffer);
                         // remove newline from buffer
@@ -435,7 +430,18 @@ namespace WPEFramework
                 list.ToString(response);
                 NMLOG_INFO("Response is, %s", response.c_str());
             }
-            fclose(pipe);
+            exitStatus = pclose(pipe);
+            // Check the exit status to determine if the command was successful
+            if (WIFEXITED(exitStatus) && WEXITSTATUS(exitStatus) == 0) {
+                pingResult["success"] = true;
+                pingResult["error"] = "";
+                NMLOG_INFO("--------- GURU :Command executed successfully:----------\n");
+            } else {
+                pingResult["success"] = false;
+                pingResult["error"] = "Could not ping endpoint";
+                pingResult.ToString(response);
+                NMLOG_INFO("--------- GURU :Command execution failed:----------\n");
+            }
             return;
         }
 

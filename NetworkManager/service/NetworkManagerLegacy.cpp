@@ -442,9 +442,9 @@ const string CIDR_PREFIXES[CIDR_NETMASK_IP_LEN] = {
             if (Core::ERROR_NONE == rc)
             {
                 response["target"] = parameters["endpoint"];
-                response["error"] = "";
+                //response["error"] = "";
                 response["guid"] = parameters["guid"];
-                response["success"] = true;
+                //response["success"] = true;
             }
             LOGTRACEMETHODFIN();
             return rc;

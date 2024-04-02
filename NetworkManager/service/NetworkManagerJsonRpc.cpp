@@ -612,7 +612,7 @@ namespace WPEFramework
             {
                 JsonObject reply;
                 reply.FromString(result);
-                reply["success"] = true;
+                //reply["success"] = true;
                 response = reply;
             }
             LOGTRACEMETHODFIN();
