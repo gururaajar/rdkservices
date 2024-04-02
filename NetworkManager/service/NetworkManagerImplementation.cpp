@@ -332,76 +332,86 @@ namespace WPEFramework
 
             if (NETMGR_PING == event)
             {
-                while (!feof(pipe) && fgets(buffer, 1024, pipe) != NULL)
+                if(fgets(buffer, 1024, pipe) == NULL)
                 {
-                    // remove newline from buffer
-                    buffer[strcspn(buffer, "\n")] = '\0';
-                    string line(buffer);
-
-                    if( line.find( "packet" ) != string::npos )
+                    pingResult["success"] = false;
+                    pingResult["error"] = "Could not ping endpoint";
+                    NMLOG_INFO ("------------- GURU buffer content in IF %s\n -------------", buffer);
+                }
+                else
+                { 
+                    while (!feof(pipe) && fgets(buffer, 1024, pipe) != NULL)
                     {
-                        //Example: 10 packets transmitted, 10 packets received, 0% packet loss
-                        stringstream ss( line );
-                        int transCount;
-                        ss >> transCount;
-                        pingResult["packetsTransmitted"] = transCount;
+                        NMLOG_INFO ("------------- GURU buffer content in ELSE %s\n -------------", buffer);
+                        // remove newline from buffer
+                        buffer[strcspn(buffer, "\n")] = '\0';
+                        string line(buffer);
 
-                        string token;
-                        getline( ss, token, ',' );
-                        getline( ss, token, ',' );
-                        stringstream ss2( token );
-                        int rxCount;
-                        ss2 >> rxCount;
-                        pingResult["packetsReceived"] = rxCount;
-
-                        getline( ss, token, ',' );
-                        string prefix = token.substr(0, token.find("%"));
-                        pingResult["packetLoss"] = prefix.c_str();
-
-                    }
-                    else if( line.find( "min/avg/max" ) != string::npos )
-                    {
-                        //Example: round-trip min/avg/max = 17.038/18.310/20.197 ms
-                        stringstream ss( line );
-                        string fullpath;
-                        getline( ss, fullpath, '=' );
-                        getline( ss, fullpath, '=' );
-
-                        string prefix;
-                        int index = fullpath.find("/");
-                        if (index >= 0)
+                        if( line.find( "packet" ) != string::npos )
                         {
-                            prefix = fullpath.substr(0, fullpath.find("/"));
-                            pingResult["tripMin"] = prefix.c_str();
-                        }
+                            //Example: 10 packets transmitted, 10 packets received, 0% packet loss
+                            stringstream ss( line );
+                            int transCount;
+                            ss >> transCount;
+                            pingResult["packetsTransmitted"] = transCount;
 
-                        index = fullpath.find("/");
-                        if (index >= 0)
-                        {
-                            fullpath = fullpath.substr(index + 1, fullpath.length());
-                            prefix = fullpath.substr(0, fullpath.find("/"));
-                            pingResult["tripAvg"] = prefix.c_str();
-                        }
+                            string token;
+                            getline( ss, token, ',' );
+                            getline( ss, token, ',' );
+                            stringstream ss2( token );
+                            int rxCount;
+                            ss2 >> rxCount;
+                            pingResult["packetsReceived"] = rxCount;
 
-                        index = fullpath.find("/");
-                        if (index >= 0)
-                        {
-                            fullpath = fullpath.substr(index + 1, fullpath.length());
-                            prefix = fullpath.substr(0, fullpath.find("/"));
-                            pingResult["tripMax"] = prefix.c_str();
-                        }
+                            getline( ss, token, ',' );
+                            string prefix = token.substr(0, token.find("%"));
+                            pingResult["packetLoss"] = prefix.c_str();
 
-                        index = fullpath.find("/");
-                        if (index >= 0)
-                        {
-                            fullpath = fullpath.substr(index + 1, fullpath.length());
-                            pingResult["tripStdDev"] = fullpath.c_str();
                         }
-                    }
-                    else if( line.find( "bad" ) != string::npos )
-                    {
-                        pingResult["success"] = false;
-                        pingResult["error"] = "Bad Address";
+                        else if( line.find( "min/avg/max" ) != string::npos )
+                        {
+                            //Example: round-trip min/avg/max = 17.038/18.310/20.197 ms
+                            stringstream ss( line );
+                            string fullpath;
+                            getline( ss, fullpath, '=' );
+                            getline( ss, fullpath, '=' );
+
+                            string prefix;
+                            int index = fullpath.find("/");
+                            if (index >= 0)
+                            {
+                                prefix = fullpath.substr(0, fullpath.find("/"));
+                                pingResult["tripMin"] = prefix.c_str();
+                            }
+
+                            index = fullpath.find("/");
+                            if (index >= 0)
+                            {
+                                fullpath = fullpath.substr(index + 1, fullpath.length());
+                                prefix = fullpath.substr(0, fullpath.find("/"));
+                                pingResult["tripAvg"] = prefix.c_str();
+                            }
+
+                            index = fullpath.find("/");
+                            if (index >= 0)
+                            {
+                                fullpath = fullpath.substr(index + 1, fullpath.length());
+                                prefix = fullpath.substr(0, fullpath.find("/"));
+                                pingResult["tripMax"] = prefix.c_str();
+                            }
+
+                            index = fullpath.find("/");
+                            if (index >= 0)
+                            {
+                                fullpath = fullpath.substr(index + 1, fullpath.length());
+                                pingResult["tripStdDev"] = fullpath.c_str();
+                            }
+                        }
+                        else if( line.find( "bad" ) != string::npos )
+                        {
+                            pingResult["success"] = false;
+                            pingResult["error"] = "Bad Address";
+                        }
                     }
                 }
 
