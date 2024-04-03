@@ -686,7 +686,7 @@ namespace WPEFramework
         }
 
         /* @brief Get IP Address Of the Interface */
-        uint32_t NetworkManagerImplementation::GetIPSettings(const string& interface /* @in */, const string& ipversion /* @in */, IPAddressInfo& result /* @out */)
+        uint32_t NetworkManagerImplementation::GetIPSettings(const string& interface /* @in */, const string& ipversion /* @in */, IPAddressInfo& result /* @out */, int& errCode /* @out */)
         {
             LOG_ENTRY_FUNCTION();
             uint32_t rc = Core::ERROR_RPC_CALL_FAILED;
@@ -713,6 +713,7 @@ namespace WPEFramework
                 result.m_gateway        = string(iarmData.gateway,MAX_IP_ADDRESS_LEN - 1);
                 result.m_primaryDns     = string(iarmData.primarydns,MAX_IP_ADDRESS_LEN - 1);
                 result.m_secondaryDns   = string(iarmData.secondarydns,MAX_IP_ADDRESS_LEN - 1);
+                errCode = iarmData.errCode;
                 NMLOG_INFO("NetworkManagerImplementation::GetIPSettings - IARM Success.. Filled the data");
                 rc = Core::ERROR_NONE;
             }
@@ -950,7 +951,7 @@ const string CIDR_PREFIXES[CIDR_NETMASK_IP_LEN] = {
             param.data.connect.security_mode = (SsidSecurity) ssid.m_securityMode;
 
             IARM_Result_t retVal = IARM_Bus_Call(IARM_BUS_NM_SRV_MGR_NAME, IARM_BUS_WIFI_MGR_API_saveSSID, (void *)&param, sizeof(param));
-            if(retVal == IARM_RESULT_SUCCESS)
+            if((retVal == IARM_RESULT_SUCCESS) && param.status) 
             {
                 NMLOG_INFO ("AddToKnownSSIDs Success");
                 rc = Core::ERROR_NONE;
@@ -975,7 +976,7 @@ const string CIDR_PREFIXES[CIDR_NETMASK_IP_LEN] = {
             (void)ssid;
 
             IARM_Result_t retVal = IARM_Bus_Call(IARM_BUS_NM_SRV_MGR_NAME, IARM_BUS_WIFI_MGR_API_clearSSID, (void *)&param, sizeof(param));
-            if(retVal == IARM_RESULT_SUCCESS)
+            if((retVal == IARM_RESULT_SUCCESS) && param.status)
             {
                 NMLOG_INFO ("RemoveKnownSSID Success");
                 rc = Core::ERROR_NONE;
@@ -1004,7 +1005,7 @@ const string CIDR_PREFIXES[CIDR_NETMASK_IP_LEN] = {
 
             retVal = IARM_Bus_Call( IARM_BUS_NM_SRV_MGR_NAME, IARM_BUS_WIFI_MGR_API_connect, (void *)&param, sizeof(param));
 
-            if(retVal == IARM_RESULT_SUCCESS && param.status)
+            if((retVal == IARM_RESULT_SUCCESS) && param.status)
             {
                 NMLOG_INFO ("WiFiConnect Success");
                 rc = Core::ERROR_NONE;
@@ -1019,11 +1020,13 @@ const string CIDR_PREFIXES[CIDR_NETMASK_IP_LEN] = {
         uint32_t NetworkManagerImplementation::WiFiDisconnect(void)
         {
             LOG_ENTRY_FUNCTION();
+            IARM_Result_t retVal = IARM_RESULT_SUCCESS;
             uint32_t rc = Core::ERROR_RPC_CALL_FAILED;
             IARM_Bus_WiFiSrvMgr_Param_t param;
             memset(&param, 0, sizeof(param));
 
-            if (IARM_RESULT_SUCCESS == IARM_Bus_Call(IARM_BUS_NM_SRV_MGR_NAME, IARM_BUS_WIFI_MGR_API_disconnectSSID, (void *)&param, sizeof(param)))
+            retVal = IARM_Bus_Call(IARM_BUS_NM_SRV_MGR_NAME, IARM_BUS_WIFI_MGR_API_disconnectSSID, (void *)&param, sizeof(param));
+            if ((retVal == IARM_RESULT_SUCCESS) && param.status)
             {
                 NMLOG_INFO ("WiFiDisconnect started");
                 rc = Core::ERROR_NONE;

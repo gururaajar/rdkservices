@@ -154,7 +154,7 @@ namespace WPEFramework
             uint32_t EnableInterface (const string& interface/* @in */) override;
             uint32_t DisableInterface (const string& interface/* @in */) override;
             /* @brief Get IP Address Of the Interface */
-            uint32_t GetIPSettings(const string& interface /* @in */, const string &ipversion /* @in */, IPAddressInfo& result /* @out */) override;
+            uint32_t GetIPSettings(const string& interface /* @in */, const string &ipversion /* @in */, IPAddressInfo& result /* @out */, uint32_t& errCode /* @out */) override;
             /* @brief Set IP Address Of the Interface */
             uint32_t SetIPSettings(const string& interface /* @in */, const string &ipversion /* @in */, const IPAddressInfo& address /* @in */) override;
 

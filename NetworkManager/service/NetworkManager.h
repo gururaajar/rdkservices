@@ -29,6 +29,16 @@
 #include <string>
 #include <atomic>
 
+typedef enum _NetworkManager_GetIPSettings_ErrorCode_t
+{
+  NETWORK_IPADDRESS_ACQUIRED,
+  NETWORK_IPADDRESS_NOTFOUND,
+  NETWORK_NO_ROUTE_INTERFACE,
+  NETWORK_NO_DEFAULT_ROUTE,
+  NETWORK_DNS_NOT_CONFIGURED,
+  NETWORK_INVALID_IPADDRESS,
+} NetworkManager_GetIPSettings_ErrorCode_t;
+
 namespace WPEFramework
 {
     namespace Plugin

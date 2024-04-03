@@ -217,7 +217,7 @@ namespace WPEFramework
             virtual uint32_t DisableInterface (const string& interface/* @in */) = 0;
 
             /* @brief Get IP Address Of the Interface */
-            virtual uint32_t GetIPSettings(const string& interface /* @in */, const string &ipversion /* @in */, IPAddressInfo& result /* @out */) = 0;
+            virtual uint32_t GetIPSettings(const string& interface /* @in */, const string &ipversion /* @in */, IPAddressInfo& result /* @out */, int& errCode /* @out */) = 0;
             /* @brief Set IP Address Of the Interface */
             virtual uint32_t SetIPSettings(const string& interface /* @in */, const string &ipversion /* @in */, const IPAddressInfo& address /* @in */) = 0;
 

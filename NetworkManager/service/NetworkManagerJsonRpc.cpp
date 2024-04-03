@@ -251,32 +251,44 @@ namespace WPEFramework
         uint32_t NetworkManager::GetIPSettings (const JsonObject& parameters, JsonObject& response)
         {
             LOGINFOMETHOD();
+            int errCode;
             uint32_t rc = Core::ERROR_GENERAL;
-            const string interface = parameters["interface"].String();
-            const string ipversion = parameters["ipversion"].String();
+            string interface = "";
+            string ipversion = "";
             Exchange::INetworkManager::IPAddressInfo result{};
 
+            interface = parameters["interface"].String();
+            ipversion = parameters["ipversion"].String();
             if (_NetworkManager)
-                rc = _NetworkManager->GetIPSettings(interface, ipversion, result);
+                rc = _NetworkManager->GetIPSettings(interface, ipversion, result, errCode);
             else
                 rc = Core::ERROR_UNAVAILABLE;
 
             if (Core::ERROR_NONE == rc)
             {
-                response["interface"] = interface;
-                if(result.m_ipAddrType == "IPV6" || result.m_ipAddrType == "IPV4")
-                    result.m_ipAddrType[2] = tolower(result.m_ipAddrType[2]);
-                response["ipversion"] = result.m_ipAddrType;
-                response["autoconfig"]   = result.m_autoConfig;
-                response["ipaddress"]    = result.m_ipAddress;
-                response["prefix"]       = result.m_prefix;    
-                response["gateway"]      = result.m_gateway;
-                response["dhcpserver"]   = result.m_dhcpServer;
-                if(!result.m_v6LinkLocal.empty())
-                    response["v6LinkLocal"] = result.m_v6LinkLocal;
-                response["primarydns"]   = result.m_primaryDns; 
-                response["secondarydns"] = result.m_secondaryDns;
-                response["success"] = true;
+                if (errCode == NETWORK_IPADDRESS_NOTFOUND)
+                {
+                    response["interface"]  = interface;
+                    response["autoconfig"] = result.m_autoConfig;
+                    response["success"] = true;
+                }
+                if (errCode == NETWORK_IPADDRESS_ACQUIRED)
+                {
+                    response["interface"] = interface;
+                    if(result.m_ipAddrType == "IPV6" || result.m_ipAddrType == "IPV4")
+                        result.m_ipAddrType[2] = tolower(result.m_ipAddrType[2]);
+                    response["ipversion"] = result.m_ipAddrType;
+                    response["autoconfig"]   = result.m_autoConfig;
+                    response["ipaddress"]    = result.m_ipAddress;
+                    response["prefix"]       = result.m_prefix;    
+                    response["gateway"]      = result.m_gateway;
+                    response["dhcpserver"]   = result.m_dhcpServer;
+                    if(!result.m_v6LinkLocal.empty())
+                        response["v6LinkLocal"] = result.m_v6LinkLocal;
+                    response["primarydns"]   = result.m_primaryDns; 
+                    response["secondarydns"] = result.m_secondaryDns;
+                    response["success"] = true;
+                }
             }
             LOGTRACEMETHODFIN();
             return rc;
@@ -287,9 +299,11 @@ namespace WPEFramework
             LOGINFOMETHOD();
             uint32_t rc = Core::ERROR_GENERAL;
             Exchange::INetworkManager::IPAddressInfo result{};
-            const string interface = parameters["interface"].String();
-            const string ipversion = parameters["ipversion"].String();
+            string interface = "";
+            string ipversion = "";
 
+            interface = parameters["interface"].String();
+            ipversion = parameters["ipversion"].String();
             result.m_autoConfig = parameters["autoconfig"].Boolean();
             if (!result.m_autoConfig)
             {

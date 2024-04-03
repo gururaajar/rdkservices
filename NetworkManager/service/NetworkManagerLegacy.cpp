@@ -56,10 +56,10 @@ namespace WPEFramework
             Register("startConnectivityMonitoring",       &NetworkManager::StartConnectivityMonitoring, this);
             Register("getCaptivePortalURI",               &NetworkManager::GetCaptivePortalURI, this);
             Register("stopConnectivityMonitoring",        &NetworkManager::StopConnectivityMonitoring, this);
-            Register("cancelWPSPairing",                  &NetworkManager::StopWPS, this);
+            Register("cancelWPSPairing",                  &NetworkManager::cancelWPSPairing, this);
             Register("clearSSID",                         &NetworkManager::clearSSID, this);
             Register("connect",                           &NetworkManager::WiFiConnect, this);
-            Register("disconnect",                        &NetworkManager::WiFiDisconnect, this);
+            Register("disconnect",                        &NetworkManager::disconnect, this);
             Register("getConnectedSSID",                  &NetworkManager::getConnectedSSID, this);
             Register("startScan",                         &NetworkManager::StartWiFiScan, this);
             Register("stopScan",                          &NetworkManager::StopWiFiScan, this);
@@ -67,7 +67,7 @@ namespace WPEFramework
             Register("getPairedSSIDInfo",                 &NetworkManager::GetConnectedSSID, this);
             Register("initiateWPSPairing",                &NetworkManager::initiateWPSPairing, this);
             Register("isPaired",                          &NetworkManager::isPaired, this);
-            Register("saveSSID",                          &NetworkManager::AddToKnownSSIDs, this);
+            Register("saveSSID",                          &NetworkManager::saveSSID, this);
             Register("getSupportedSecurityModes",         &NetworkManager::GetSupportedSecurityModes, this);
             Register("getCurrentState",                   &NetworkManager::GetWifiState, this);
         }
@@ -229,6 +229,7 @@ const string CIDR_PREFIXES[CIDR_NETMASK_IP_LEN] = {
 
             if (Core::ERROR_NONE == rc)
             {
+                response["result"] = string();
                 response["success"] = true;
             }
             LOGTRACEMETHODFIN();
@@ -514,6 +515,10 @@ const string CIDR_PREFIXES[CIDR_NETMASK_IP_LEN] = {
 
             tmpParameters["ssid"] = "";
             rc = RemoveKnownSSID(tmpParameters, response);
+            if (Core::ERROR_NONE == rc)
+            {
+                response["result"] = 0; 
+            }
 
             LOGTRACEMETHODFIN();
             return rc;
@@ -566,5 +571,55 @@ const string CIDR_PREFIXES[CIDR_NETMASK_IP_LEN] = {
             LOGTRACEMETHODFIN();
             return rc;
         }
+
+        uint32_t NetworkManager::saveSSID (const JsonObject& parameters, JsonObject& response)
+        {
+            uint32_t rc = Core::ERROR_GENERAL;
+
+            LOGINFOMETHOD();
+
+            rc = AddToKnownSSIDs(parameters, response);
+            if (Core::ERROR_NONE == rc)
+            {
+                response["result"] = 0; 
+            }
+
+            LOGTRACEMETHODFIN();
+            return rc;
+        }
+
+        uint32_t NetworkManager::disconnect (const JsonObject& parameters, JsonObject& response)
+        {
+            uint32_t rc = Core::ERROR_GENERAL;
+
+            LOGINFOMETHOD();
+
+            rc = WiFiDisconnect(parameters, response);
+            if (Core::ERROR_NONE == rc)
+            {
+                response["result"] = 0; 
+            }
+
+            LOGTRACEMETHODFIN();
+            return rc;
+        }
+
+        uint32_t NetworkManager::cancelWPSPairing (const JsonObject& parameters, JsonObject& response)
+        {
+            uint32_t rc = Core::ERROR_GENERAL;
+
+            LOGINFOMETHOD();
+
+            rc = StopWPS(parameters, response);
+            if (Core::ERROR_NONE == rc)
+            {
+                response["result"] = string();
+            }
+
+            LOGTRACEMETHODFIN();
+            return rc;
+        }
+
+       
     }
 }
