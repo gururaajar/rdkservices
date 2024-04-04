@@ -251,7 +251,7 @@ namespace WPEFramework
         uint32_t NetworkManager::GetIPSettings (const JsonObject& parameters, JsonObject& response)
         {
             LOGINFOMETHOD();
-            int errCode;
+            uint32_t errCode;
             uint32_t rc = Core::ERROR_GENERAL;
             string interface = "";
             string ipversion = "";
