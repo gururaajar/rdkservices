@@ -410,6 +410,8 @@ namespace WPEFramework
             uint32_t startScan(const JsonObject& parameters, JsonObject& response);
             uint32_t stopScan(const JsonObject& parameters, JsonObject& response);
             uint32_t getCurrentState(const JsonObject& parameters, JsonObject& response);
+            uint32_t getIPSettings2(const JsonObject& parameters, JsonObject& response);
+            uint32_t setIPSettings2(const JsonObject& parameters, JsonObject& response);
 #endif
         private:
             uint32_t _connectionId;

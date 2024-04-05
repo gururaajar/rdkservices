@@ -24,6 +24,16 @@
 
 using namespace NetworkManagerLogger;
 
+typedef enum _NetworkManager_GetIPSettings_ErrorCode_t
+{
+  NETWORK_IPADDRESS_ACQUIRED,
+  NETWORK_IPADDRESS_NOTFOUND,
+  NETWORK_NO_ROUTE_INTERFACE,
+  NETWORK_NO_DEFAULT_ROUTE,
+  NETWORK_DNS_NOT_CONFIGURED,
+  NETWORK_INVALID_IPADDRESS,
+} NetworkManager_GetIPSettings_ErrorCode_t;
+
 namespace WPEFramework
 {
     namespace Plugin
@@ -255,32 +265,41 @@ namespace WPEFramework
             string interface = "";
             string ipversion = "";
             Exchange::INetworkManager::IPAddressInfo result{};
+            uint32_t errCode;
 
             if (parameters.HasLabel("interface"))
                 interface = parameters["interface"].String();
             if (parameters.HasLabel("ipversion"))
                 ipversion = parameters["ipversion"].String();
             if (_NetworkManager)
-                rc = _NetworkManager->GetIPSettings(interface, ipversion, result);
+                rc = _NetworkManager->GetIPSettings(interface, ipversion, result, errCode);
             else
                 rc = Core::ERROR_UNAVAILABLE;
 
             if (Core::ERROR_NONE == rc)
             {
                 response["interface"] = interface;
-                if(result.m_ipAddrType == "IPV6" || result.m_ipAddrType == "IPV4")
-                    result.m_ipAddrType[2] = tolower(result.m_ipAddrType[2]);
-                response["ipversion"] = result.m_ipAddrType;
-                response["autoconfig"]   = result.m_autoConfig;
-                response["ipaddress"]    = result.m_ipAddress;
-                response["prefix"]       = result.m_prefix;    
-                response["gateway"]      = result.m_gateway;
-                response["dhcpserver"]   = result.m_dhcpServer;
-                if(!result.m_v6LinkLocal.empty())
-                    response["v6LinkLocal"] = result.m_v6LinkLocal;
-                response["primarydns"]   = result.m_primaryDns; 
-                response["secondarydns"] = result.m_secondaryDns;
-                response["success"] = true;
+                if (errCode == NETWORK_IPADDRESS_NOTFOUND)
+                {
+                    response["autoconfig"] = result.m_autoConfig;
+                    response["success"] = true;
+                }
+                if (errCode == NETWORK_IPADDRESS_ACQUIRED)
+                {
+                    if(result.m_ipAddrType == "IPV6" || result.m_ipAddrType == "IPV4")
+                        result.m_ipAddrType[2] = tolower(result.m_ipAddrType[2]);
+                    response["ipversion"] = result.m_ipAddrType;
+                    response["autoconfig"]   = result.m_autoConfig;
+                    response["ipaddress"]    = result.m_ipAddress;
+                    response["prefix"]       = result.m_prefix;    
+                    response["gateway"]      = result.m_gateway;
+                    response["dhcpserver"]   = result.m_dhcpServer;
+                    if(!result.m_v6LinkLocal.empty())
+                        response["v6LinkLocal"] = result.m_v6LinkLocal;
+                    response["primarydns"]   = result.m_primaryDns; 
+                    response["secondarydns"] = result.m_secondaryDns;
+                    response["success"] = true;
+                }
             }
             LOGTRACEMETHODFIN();
             return rc;

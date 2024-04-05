@@ -686,7 +686,7 @@ namespace WPEFramework
         }
 
         /* @brief Get IP Address Of the Interface */
-        uint32_t NetworkManagerImplementation::GetIPSettings(const string& interface /* @in */, const string& ipversion /* @in */, IPAddressInfo& result /* @out */)
+        uint32_t NetworkManagerImplementation::GetIPSettings(const string& interface /* @in */, const string& ipversion /* @in */, IPAddressInfo& result /* @out */, uint32_t &errCode)
         {
             LOG_ENTRY_FUNCTION();
             uint32_t rc = Core::ERROR_RPC_CALL_FAILED;
@@ -713,6 +713,7 @@ namespace WPEFramework
                 result.m_gateway        = string(iarmData.gateway,MAX_IP_ADDRESS_LEN - 1);
                 result.m_primaryDns     = string(iarmData.primarydns,MAX_IP_ADDRESS_LEN - 1);
                 result.m_secondaryDns   = string(iarmData.secondarydns,MAX_IP_ADDRESS_LEN - 1);
+                errCode                 = iarmData.errCode;
                 NMLOG_INFO("NetworkManagerImplementation::GetIPSettings - IARM Success.. Filled the data");
                 rc = Core::ERROR_NONE;
             }

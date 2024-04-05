@@ -19,6 +19,7 @@
 
 #include "NetworkManager.h"
 #include "NetworkConnectivity.h"
+#include "UtilsJsonRpc.h"
 
 #define LOGINFOMETHOD() { std::string json; parameters.ToString(json); NMLOG_TRACE("Legacy params=%s", json.c_str() ); }
 #define LOGTRACEMETHODFIN() { std::string json; response.ToString(json); NMLOG_TRACE("Legacy response=%s", json.c_str() ); }
@@ -41,6 +42,7 @@ namespace WPEFramework
          */
         void NetworkManager::RegisterLegacyMethods()
         {
+            CreateHandler({2});
             Register("getInterfaces",                     &NetworkManager::getInterfaces, this);
             Register("isInterfaceEnabled",                &NetworkManager::isInterfaceEnabled, this);
             Register("getPublicIP",                       &NetworkManager::getPublicIP, this);
@@ -70,6 +72,8 @@ namespace WPEFramework
             Register("saveSSID",                          &NetworkManager::saveSSID, this);
             Register("getSupportedSecurityModes",         &NetworkManager::GetSupportedSecurityModes, this);
             Register("getCurrentState",                   &NetworkManager::GetWifiState, this);
+            GetHandler(2)->Register<JsonObject, JsonObject>("setIPSettings", &NetworkManager::setIPSettings2, this);
+            GetHandler(2)->Register<JsonObject, JsonObject>("getIPSettings", &NetworkManager::getIPSettings2, this);
         }
 
         /**
@@ -614,6 +618,110 @@ const string CIDR_PREFIXES[CIDR_NETMASK_IP_LEN] = {
                 response["result"] = string();
             }
 
+            LOGTRACEMETHODFIN();
+            return rc;
+        }
+
+        uint32_t NetworkManager::getIPSettings2(const JsonObject& parameters, JsonObject& response)
+        {
+            uint32_t rc = Core::ERROR_GENERAL;
+            JsonObject tmpResponse;
+            JsonObject tmpParameters;
+            size_t index;
+
+            LOGINFOMETHOD();
+
+            if (parameters.HasLabel("ipversion"))
+                tmpParameters["ipversion"] = parameters["ipversion"];
+            if (parameters.HasLabel("interface"))
+            {
+                if ("WIFI" == parameters["interface"].String())
+                    tmpParameters["interface"] = "wlan0";
+                else if("ETHERNET" == parameters["interface"].String())
+                    tmpParameters["interface"] = "eth0";
+            }
+
+            rc = GetIPSettings(tmpParameters, tmpResponse);
+
+            if (Core::ERROR_NONE == rc)
+            {
+                if (parameters.HasLabel("interface"))
+                {
+                    response["interface"] = parameters["interface"];
+                }
+                else
+                {
+                    if ("wlan0" == m_defaultInterface)
+                        response["interface"] = "WIFI";
+                    else if("eth0" == m_defaultInterface)
+                        response["interface"] = "ETHERNET";
+                }
+
+                index = tmpResponse["prefix"].Number();
+                if(CIDR_NETMASK_IP_LEN <= index)
+                    return Core::ERROR_GENERAL;
+                else
+                    response["netmask"]  = CIDR_PREFIXES[index];
+                response["ipversion"]    = tmpResponse["ipversion"];
+                response["autoconfig"]   = tmpResponse["autoconfig"];
+                response["dhcpserver"]   = tmpResponse["dhcpserver"];
+                response["ipaddr"]       = tmpResponse["ipaddress"];
+                response["gateway"]      = tmpResponse["gateway"];
+                response["primarydns"]   = tmpResponse["primarydns"];
+                response["secondarydns"] = tmpResponse["secondarydns"];
+                response["success"]      = tmpResponse["success"];
+            }
+            LOGTRACEMETHODFIN();
+            return rc;
+        }
+
+        uint32_t NetworkManager::setIPSettings2(const JsonObject& parameters, JsonObject& response)
+        {
+            uint32_t rc = Core::ERROR_GENERAL;
+            JsonObject tmpResponse;
+            JsonObject tmpParameters;
+            string interface = "";
+            string ipversion = "";
+            string netmask = "";
+            string gateway = "";
+            string ipaddr = "";
+            string primarydns = "";
+            string secondarydns = "";
+            bool autoconfig = true;
+
+            Exchange::INetworkManager::IPAddressInfo result{};
+
+            LOGINFOMETHOD();
+
+            getDefaultStringParameter("interface", interface, "");
+            if("WIFI" == parameters["interface"].String())
+                tmpParameters["interface"] = "wlan0";
+            else if("ETHERNET" == parameters["interface"].String())
+                tmpParameters["interface"] = "eth0";
+            else
+                tmpParameters["interface"] = interface;
+            getDefaultStringParameter("ipversion", ipversion, "");
+            tmpParameters["ipversion"] = ipversion;
+            getDefaultBoolParameter("autoconfig", autoconfig, true);
+            tmpParameters["autoconfig"] = autoconfig;
+            getDefaultStringParameter("ipaddr", ipaddr, "");
+            tmpParameters["ipaddress"] = ipaddr;
+            getDefaultStringParameter("netmask", netmask, "");
+            tmpParameters["netmask"] = netmask;
+            getDefaultStringParameter("gateway", gateway, "");
+            tmpParameters["gateway"] = gateway;
+            getDefaultStringParameter("primarydns", primarydns, "0.0.0.0");
+            tmpParameters["primarydns"] = primarydns;
+            getDefaultStringParameter("secondarydns", secondarydns, "");
+            tmpParameters["secondarydns"] = secondarydns;
+            
+            rc = SetIPSettings(tmpParameters, tmpResponse);
+
+            if (Core::ERROR_NONE == rc)
+            {
+                response["supported"] = true;
+                response["success"] = tmpResponse["success"];
+            }
             LOGTRACEMETHODFIN();
             return rc;
         }
