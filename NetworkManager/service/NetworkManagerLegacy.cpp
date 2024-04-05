@@ -41,6 +41,7 @@ namespace WPEFramework
          */
         void NetworkManager::RegisterLegacyMethods()
         {
+            CreateHandler({2});
             Register("getInterfaces",                     &NetworkManager::getInterfaces, this);
             Register("isInterfaceEnabled",                &NetworkManager::isInterfaceEnabled, this);
             Register("getPublicIP",                       &NetworkManager::getPublicIP, this);
@@ -70,6 +71,8 @@ namespace WPEFramework
             Register("saveSSID",                          &NetworkManager::saveSSID, this);
             Register("getSupportedSecurityModes",         &NetworkManager::GetSupportedSecurityModes, this);
             Register("getCurrentState",                   &NetworkManager::GetWifiState, this);
+            GetHandler(2)->Register<JsonObject, JsonObject>("setIPSettings", &NetworkManager::setIPSettings2, this);
+            GetHandler(2)->Register<JsonObject, JsonObject>("getIPSettings", &NetworkManager::getIPSettings2, this);
         }
 
         /**
@@ -617,5 +620,96 @@ const string CIDR_PREFIXES[CIDR_NETMASK_IP_LEN] = {
             LOGTRACEMETHODFIN();
             return rc;
         }
+
+        uint32_t NetworkManager::getIPSettings2(const JsonObject& parameters, JsonObject& response)
+        {
+            uint32_t rc = Core::ERROR_GENERAL;
+            JsonObject tmpResponse;
+            JsonObject tmpParameters;
+            size_t index;
+
+            LOGINFOMETHOD();
+
+            if (parameters.HasLabel("ipversion"))
+                tmpParameters["ipversion"] = parameters["ipversion"];
+            if (parameters.HasLabel("interface"))
+            {
+                if ("WIFI" == parameters["interface"].String())
+                    tmpParameters["interface"] = "wlan0";
+                else if("ETHERNET" == parameters["interface"].String())
+                    tmpParameters["interface"] = "eth0";
+            }
+
+            rc = GetIPSettings(tmpParameters, tmpResponse);
+
+            if (Core::ERROR_NONE == rc)
+            {
+                if (parameters.HasLabel("interface"))
+                {
+                    response["interface"] = parameters["interface"];
+                }
+                else
+                {
+                    if ("wlan0" == m_defaultInterface)
+                        response["interface"] = "WIFI";
+                    else if("eth0" == m_defaultInterface)
+                        response["interface"] = "ETHERNET";
+                }
+
+                index = tmpResponse["prefix"].Number();
+                if(CIDR_NETMASK_IP_LEN <= index)
+                    return Core::ERROR_GENERAL;
+                else
+                    response["netmask"]  = CIDR_PREFIXES[index];
+                response["ipversion"]    = tmpResponse["ipversion"];
+                response["autoconfig"]   = tmpResponse["autoconfig"];
+                response["dhcpserver"]   = tmpResponse["dhcpserver"];
+                response["ipaddr"]       = tmpResponse["ipaddress"];
+                response["gateway"]      = tmpResponse["gateway"];
+                response["primarydns"]   = tmpResponse["primarydns"];
+                response["secondarydns"] = tmpResponse["secondarydns"];
+                response["success"]      = tmpResponse["success"];
+            }
+            LOGTRACEMETHODFIN();
+            return rc;
+        }
+
+        uint32_t NetworkManager::setIPSettings2(const JsonObject& parameters, JsonObject& response)
+        {
+            uint32_t rc = Core::ERROR_GENERAL;
+            JsonObject tmpResponse;
+            JsonObject tmpParameters;
+            Exchange::INetworkManager::IPAddressInfo result{};
+
+            LOGINFOMETHOD();
+            
+            if("WIFI" == parameters["interface"].String())
+                tmpParameters["interface"] = "wlan0";
+            else if("ETHERNET" == parameters["interface"].String())
+                tmpParameters["interface"] = "eth0";
+            
+            tmpParameters["ipversion"] = parameters["ipversion"];
+            tmpParameters["autoconfig"] = parameters["autoconfig"];
+            tmpParameters["ipaddress"] = parameters["ipaddr"];
+            auto it = std::find(std::begin(CIDR_PREFIXES), std::end(CIDR_PREFIXES), parameters["netmask"].String());
+            if (it == std::end(CIDR_PREFIXES))
+                return rc;
+            else
+                tmpParameters["prefix"] = std::distance(std::begin(CIDR_PREFIXES), it);
+            tmpParameters["gateway"] = parameters["gateway"];
+            tmpParameters["primarydns"] = parameters["primarydns"];
+            tmpParameters["secondarydns"] = parameters["secondarydns"];
+
+            rc = SetIPSettings(tmpParameters, tmpResponse);
+
+            if (Core::ERROR_NONE == rc)
+            {
+                response["supported"] = true;
+                response["success"] = tmpResponse["success"];
+            }
+            LOGTRACEMETHODFIN();
+            return rc;
+        }
+ 
     }
 }
