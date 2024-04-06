@@ -657,19 +657,30 @@ const string CIDR_PREFIXES[CIDR_NETMASK_IP_LEN] = {
                         response["interface"] = "ETHERNET";
                 }
 
-                index = tmpResponse["prefix"].Number();
-                if(CIDR_NETMASK_IP_LEN <= index)
-                    return Core::ERROR_GENERAL;
-                else
-                    response["netmask"]  = CIDR_PREFIXES[index];
-                response["ipversion"]    = tmpResponse["ipversion"];
-                response["autoconfig"]   = tmpResponse["autoconfig"];
-                response["dhcpserver"]   = tmpResponse["dhcpserver"];
-                response["ipaddr"]       = tmpResponse["ipaddress"];
-                response["gateway"]      = tmpResponse["gateway"];
-                response["primarydns"]   = tmpResponse["primarydns"];
-                response["secondarydns"] = tmpResponse["secondarydns"];
-                response["success"]      = tmpResponse["success"];
+                if (tmpResponse.HasLabel("prefix"))
+                {
+                    index = tmpResponse["prefix"].Number();
+                    if(CIDR_NETMASK_IP_LEN <= index)
+                        return Core::ERROR_GENERAL;
+                    else
+                        response["netmask"]  = CIDR_PREFIXES[index];
+                }
+                if (tmpResponse.HasLabel("ipversion"))
+                    response["ipversion"]    = tmpResponse["ipversion"];
+                if (tmpResponse.HasLabel("autoconfig"))
+                    response["autoconfig"]   = tmpResponse["autoconfig"];
+                if (tmpResponse.HasLabel("dhcpserver")) 
+                    response["dhcpserver"]   = tmpResponse["dhcpserver"];
+                if (tmpResponse.HasLabel("ipaddress"))
+                    response["ipaddr"]       = tmpResponse["ipaddress"];
+                if (tmpResponse.HasLabel("gateway"))
+                    response["gateway"]      = tmpResponse["gateway"];
+                if (tmpResponse.HasLabel("primarydns"))
+                    response["primarydns"]   = tmpResponse["primarydns"];
+                if (tmpResponse.HasLabel("secondarydns"))
+                    response["secondarydns"] = tmpResponse["secondarydns"];
+                if (tmpResponse.HasLabel("success"))
+                    response["success"]      = tmpResponse["success"];
             }
             LOGTRACEMETHODFIN();
             return rc;
