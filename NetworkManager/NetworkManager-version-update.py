@@ -37,7 +37,7 @@ def update_readme_version(content, major, minor, patch):
 
 def main():
     # Update CMakeLists.txt
-    cmake_file = "CMakeLists.txt"
+    cmake_file = "NetworkManager/CMakeLists.txt"
     with open(cmake_file, "r") as file:
         cmake_content = file.read()
     
@@ -47,7 +47,7 @@ def main():
         file.write(new_cmake_content)
     
     # Update README.md in a different location
-    readme_file = "path/to/your/README.md"
+    readme_file = "docs/api/NetworkManagerPlugin.md"
     with open(readme_file, "r") as file:
         readme_content = file.read()
     
