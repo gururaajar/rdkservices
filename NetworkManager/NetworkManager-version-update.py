@@ -37,25 +37,34 @@ def update_readme_version(content, major, minor, patch):
 
 def main():
     # Update CMakeLists.txt
-    cmake_file = "CMakeLists.txt"
-    with open(cmake_file, "r") as file:
-        cmake_content = file.read()
+    cmake_file = "NetworkManager/CMakeLists.txt"
+    try:
+        with open(cmake_file, "r") as file:
+            cmake_content = file.read()
+        
+        new_cmake_content, major, minor, patch = increment_version_cmake(cmake_content)
+        
+        with open(cmake_file, "w") as file:
+            file.write(new_cmake_content)
+        
+        print(f"Version updated in {cmake_file} to {major}.{minor}.{patch}")
+        
+        # Update README.md in a different location
+        readme_file = "docs/api/NetworkManagerPlugin.md"
+        with open(readme_file, "r") as file:
+            readme_content = file.read()
+        
+        new_readme_content = update_readme_version(readme_content, major, minor, patch)
+        
+        with open(readme_file, "w") as file:
+            file.write(new_readme_content)
+        
+        print(f"Version updated in {readme_file} to {major}.{minor}.{patch}")
     
-    new_cmake_content, major, minor, patch = increment_version_cmake(cmake_content)
-    
-    with open(cmake_file, "w") as file:
-        file.write(new_cmake_content)
-    
-    # Update README.md in a different location
-    readme_file = "path/to/your/README.md"
-    with open(readme_file, "r") as file:
-        readme_content = file.read()
-    
-    new_readme_content = update_readme_version(readme_content, major, minor, patch)
-    
-    with open(readme_file, "w") as file:
-        file.write(new_readme_content)
+    except FileNotFoundError:
+        print(f"Error: File '{cmake_file}' or '{readme_file}' not found.")
+    except ValueError as e:
+        print(f"Error: {str(e)}")
 
 if __name__ == "__main__":
     main()
-
