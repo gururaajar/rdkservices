@@ -2,8 +2,8 @@ import re
 
 # Define the version pattern for CMakeLists.txt
 cmake_version_pattern = re.compile(
-    r"(set\(VERSION_MAJOR\s+)(\d+)(\))\s+"
-    r"(set\(VERSION_MINOR\s+)(\d+)(\))\s+"
+    r"(set\(VERSION_MAJOR\s+)(\d+)(\))\s*"
+    r"(set\(VERSION_MINOR\s+)(\d+)(\))\s*"
     r"(set\(VERSION_PATCH\s+)(\d+)(\))"
 )
 
@@ -21,7 +21,7 @@ def increment_version_cmake(content):
         patch += 1
         
         new_content = cmake_version_pattern.sub(
-            rf"\1{major}\3\n\4{minor}\6\n\7{patch}\9",
+            rf"\g<1>{major}\g<3>\n\g<4>{minor}\g<6>\n\g<7>{patch}\g<9>",
             content
         )
         return new_content, major, minor, patch
@@ -30,14 +30,14 @@ def increment_version_cmake(content):
 
 def update_readme_version(content, major, minor, patch):
     new_content = readme_version_pattern.sub(
-        rf"\1{major}.{minor}.{patch}",
+        rf"\g<1>{major}.{minor}.{patch}",
         content
     )
     return new_content
 
 def main():
     # Update CMakeLists.txt
-    cmake_file = "NetworkManager/CMakeLists.txt"
+    cmake_file = "CMakeLists.txt"
     with open(cmake_file, "r") as file:
         cmake_content = file.read()
     
@@ -47,7 +47,7 @@ def main():
         file.write(new_cmake_content)
     
     # Update README.md in a different location
-    readme_file = "docs/api/NetworkManagerPlugin.md"
+    readme_file = "path/to/your/README.md"
     with open(readme_file, "r") as file:
         readme_content = file.read()
     
@@ -58,3 +58,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
