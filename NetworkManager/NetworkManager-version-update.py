@@ -8,7 +8,6 @@ cmake_version_pattern = re.compile(
 )
 
 # Define the version pattern for README.md (e.g., "Version: 1.0.0")
-#readme_version_pattern = re.compile(r"(Version:\s+)(\d+)\.(\d+)\.(\d+)")
 readme_version_pattern = re.compile(r"(Version:\s+\[)(\d+)\.(\d+)\.(\d+)(\]\(\))")
 
 def increment_version_cmake(content):
