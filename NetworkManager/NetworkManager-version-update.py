@@ -8,7 +8,8 @@ cmake_version_pattern = re.compile(
 )
 
 # Define the version pattern for README.md (e.g., "Version: 1.0.0")
-readme_version_pattern = re.compile(r"(Version:\s+)(\d+)\.(\d+)\.(\d+)")
+#readme_version_pattern = re.compile(r"(Version:\s+)(\d+)\.(\d+)\.(\d+)")
+readme_version_pattern = re.compile(r"(Version:\s+\[)(\d+)\.(\d+)\.(\d+)(\]\(\))")
 
 def increment_version_cmake(content):
     match = cmake_version_pattern.search(content)
@@ -29,11 +30,15 @@ def increment_version_cmake(content):
         raise ValueError("Version pattern not found in CMakeLists.txt")
 
 def update_readme_version(content, major, minor, patch):
-    new_content = readme_version_pattern.sub(
-        rf"\g<1>{major}.{minor}.{patch}",
-        content
-    )
-    return new_content
+    match = readme_version_pattern.search(content)
+    if match:
+        new_content = readme_version_pattern.sub(
+            rf"\g<1>{major}.{minor}.{patch}\g<5>",
+            content
+        )
+        return new_content
+    else:
+        raise ValueError("Version pattern not found in README.md")
 
 def main():
     # Update CMakeLists.txt
