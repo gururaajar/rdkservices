@@ -1,0 +1,32 @@
+name: Version Update
+
+on:
+  push:
+    branches:
+      - test_version
+
+jobs:
+  update_version:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python (needed for script execution)
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Increment version
+        run: python increment_version.py
+
+      - name: Commit version update
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add NetworkManager/CMakeLists.txt docs/api/NetworkManagerPlugin.md
+          git commit -m "ci: bump version number"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
