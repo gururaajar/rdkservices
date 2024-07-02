@@ -26,6 +26,11 @@ jobs:
             specific_folder:
               - 'NetworkManager/**'  # Replace with the path to your specific folder
 
+      - name: Debug filtered changes
+        run: |
+            echo "Modified files:"
+            echo "${{ steps.filter_changes.outputs.modified_files }}"
+
       - name: Output repository name for debugging
         run: echo "The repository is ${{ github.repository }}"
 

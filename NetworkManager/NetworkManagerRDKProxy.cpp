@@ -443,6 +443,7 @@ namespace WPEFramework
                         IARM_BUS_NetSrvMgr_Iface_EventInterfaceConnectionStatus_t *e = (IARM_BUS_NetSrvMgr_Iface_EventInterfaceConnectionStatus_t*) data;
                         interface = e->interface;
                         NMLOG_INFO (" To test IARM_BUS_NETWORK_MANAGER_EVENT_INTERFACE_CONNECTION_STATUS :: %s", interface.c_str());
+                        NMLOG_INFO (" To test IARM_BUS_NETWORK_MANAGER_EVENT_INTERFACE_CONNECTION_STATUS :: %s", interface.c_str());
                         if(interface == "eth0" || interface == "wlan0")
                         {
                             if (e->status) {
