@@ -8,47 +8,30 @@ on:
 jobs:
   update_version:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Fetch all history for all branches
 
       - name: Set up Python (needed for script execution)
         uses: actions/setup-python@v3
         with:
           python-version: '3.x'
 
-      - name: Fetch all branches and tags
-        run: |
-          git fetch --all
-          git fetch --tags
-
-      - name: Get the latest commit hash
-        id: get_latest_commit
-        run: echo "LATEST_COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_ENV
-
-      - name: Check for existing tag
-        id: check_tag
-        run: |
-          if git rev-parse "refs/tags/version-update-${LATEST_COMMIT_HASH}" >/dev/null 2>&1; then
-            echo "IS_AMEND=true" >> $GITHUB_ENV
-          else
-            echo "IS_AMEND=false" >> $GITHUB_ENV
-          fi
+      - name: Output repository name for debugging
+        run: echo "The repository is ${{ github.repository }}"
 
       - name: Increment version if first commit
-        if: env.IS_AMEND == 'false'
+        if: github.repository == 'gururaajar/rdkservices'  # Replace with the owner and repository name
         run: python NetworkManager/NetworkManager-version-update.py
 
       - name: Commit version update
-        if: env.IS_AMEND == 'false'
+        if: github.repository == 'gururaajar/rdkservices'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add NetworkManager/CMakeLists.txt docs/api/NetworkManagerPlugin.md
-          git commit -m "CI: Incrementment the version number"
+          git commit -m "CI: Increment the version number"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
