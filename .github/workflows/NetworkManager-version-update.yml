@@ -24,30 +24,49 @@ jobs:
       - name: Determine if new commit
         id: commit_check
         run: |
-          # Determine the base branch
-          BASE_BRANCH=${{ github.event.pull_request.base.ref || 'sprint/24Q2' }}
-          echo "BASE_BRANCH=${BASE_BRANCH}"
-          # Find the point where the current branch diverged from the base branch
-          MERGE_BASE=$(git merge-base HEAD origin/${BASE_BRANCH})
-          echo "MERGE_BASE=${MERGE_BASE}"
-          # Count the number of commits from that point
-          COMMIT_COUNT=$(git rev-list --count HEAD ^${MERGE_BASE})
-          echo "COMMIT_COUNT=${COMMIT_COUNT}" >> $GITHUB_ENV
-          # Check if the current commit is already in the base branch
-          COMMIT_EXISTS=$(git branch --contains HEAD | grep -q ${BASE_BRANCH} && echo "true" || echo "false")
-          echo "COMMIT_EXISTS=${COMMIT_EXISTS}" >> $GITHUB_ENV
+          # File to store the last processed commit hash
+          STATE_FILE=".github/last_commit_hash.txt"
+          
+          # Get the latest commit hash
+          LATEST_COMMIT_HASH=$(git rev-parse HEAD)
+          echo "LATEST_COMMIT_HASH=${LATEST_COMMIT_HASH}"
+
+          # Check if the state file exists
+          if [ -f $STATE_FILE ]; then
+            LAST_COMMIT_HASH=$(cat $STATE_FILE)
+            echo "LAST_COMMIT_HASH=${LAST_COMMIT_HASH}"
+          else
+            LAST_COMMIT_HASH=""
+          fi
+
+          # Check if the commit hash has changed
+          if [ "$LATEST_COMMIT_HASH" != "$LAST_COMMIT_HASH" ]; then
+            echo "IS_NEW_COMMIT=true" >> $GITHUB_ENV
+          else
+            echo "IS_NEW_COMMIT=false" >> $GITHUB_ENV
+          fi
 
       - name: Increment version if first commit
-        if: env.COMMIT_EXISTS == 'false'
+        if: env.IS_NEW_COMMIT == 'true'
         run: python NetworkManager/NetworkManager-version-update.py
 
       - name: Commit version update
-        if: env.COMMIT_EXISTS == 'false'
+        if: env.IS_NEW_COMMIT == 'true'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add NetworkManager/CMakeLists.txt docs/api/NetworkManagerPlugin.md
           git commit -m "CI: Increment the version number"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update last processed commit hash
+        if: env.IS_NEW_COMMIT == 'true'
+        run: |
+          echo $LATEST_COMMIT_HASH > .github/last_commit_hash.txt
+          git add .github/last_commit_hash.txt
+          git commit -m "ci: update last processed commit hash"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
