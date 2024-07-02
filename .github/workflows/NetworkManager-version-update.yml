@@ -3,7 +3,7 @@ name: Version Update
 on:
   push:
     branches:
-      - test_version
+      - sprint/24Q2
 
 jobs:
   update_version:
