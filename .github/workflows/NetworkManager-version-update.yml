@@ -3,7 +3,7 @@ name: Version Update
 on:
   push:
     branches:
-      - sprint/24Q2
+      - versionauto
 
 jobs:
   update_version:
@@ -21,7 +21,7 @@ jobs:
       - name: Check if first commit
         id: first_commit_check
         run: |
-          COMMIT_COUNT=$(git rev-list --count HEAD ^$(git merge-base HEAD sprint/24Q2))
+          COMMIT_COUNT=$(git rev-list --count HEAD ^$(git merge-base HEAD versionauto))
           echo "COMMIT_COUNT=${COMMIT_COUNT}" >> $GITHUB_ENV
 
       - name: Increment version if first commit
