@@ -23,7 +23,7 @@ jobs:
         uses: dorny/paths-filter@v2
         with:
           filters: |
-            folder:
+            specific_folder:
               - 'NetworkManager/**'  # Replace with the path to your specific folder
 
       - name: Output repository name for debugging
