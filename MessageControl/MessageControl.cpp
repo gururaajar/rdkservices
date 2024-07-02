@@ -188,13 +188,13 @@ namespace WPEFramework {
 
     bool MessageControl::Attach(PluginHost::Channel& channel)
     {
-        TRACE(Trace::Information, (Core::Format(_T("Attaching channel ID [%d]"), channel.Id()).c_str()));
+        TRACE(Trace::Information, (Core::Format(_T("Attaching the channel ID [%d]"), channel.Id()).c_str()));
         return (_webSocketExporter.Attach(channel.Id()));
     }
 
     void MessageControl::Detach(PluginHost::Channel& channel)
     {
-        TRACE(Trace::Information, (Core::Format(_T("Detaching channel ID [%d]"), channel.Id()).c_str()));
+        TRACE(Trace::Information, (Core::Format(_T("Detaching the channel ID [%d]"), channel.Id()).c_str()));
         _webSocketExporter.Detach(channel.Id());
     }
 
