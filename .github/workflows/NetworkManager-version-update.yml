@@ -18,10 +18,18 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Increment version
+      - name: Check if first commit
+        id: first_commit_check
+        run: |
+          COMMIT_COUNT=$(git rev-list --count HEAD ^$(git merge-base HEAD main))
+          echo "COMMIT_COUNT=${COMMIT_COUNT}" >> $GITHUB_ENV
+
+      - name: Increment version if first commit
+        if: env.COMMIT_COUNT == '1'
         run: python NetworkManager/NetworkManager-version-update.py
 
       - name: Commit version update
+        if: env.COMMIT_COUNT == '1'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
