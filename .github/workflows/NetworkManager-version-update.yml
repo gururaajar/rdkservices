@@ -1,0 +1,40 @@
+name: Version Update
+
+on:
+  push:
+    branches:
+      - sprint/24Q2
+
+jobs:
+  update_version:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python (needed for script execution)
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'
+
+      - name: Check if first commit
+        id: first_commit_check
+        run: |
+          COMMIT_COUNT=$(git rev-list --count HEAD ^$(git merge-base HEAD sprint/24Q2))
+          echo "COMMIT_COUNT=${COMMIT_COUNT}" >> $GITHUB_ENV
+
+      - name: Increment version if first commit
+        if: env.COMMIT_COUNT == '1'
+        run: python NetworkManager/NetworkManager-version-update.py
+
+      - name: Commit version update
+        if: env.COMMIT_COUNT == '1'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add NetworkManager/CMakeLists.txt docs/api/NetworkManagerPlugin.md
+          git commit -m "CI: Increment the version number"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
