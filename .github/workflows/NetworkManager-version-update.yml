@@ -22,11 +22,11 @@ jobs:
         run: echo "The repository is ${{ github.repository }}"
 
       - name: Increment version if first commit
-        if: github.repository == 'gururaajar/rdkservices'  # Replace with the owner and repository name
+        if: github.repository == 'rdkcentral/rdkservices'  # Replace with the owner and repository name
         run: python NetworkManager/NetworkManager-version-update.py
 
       - name: Commit version update
-        if: github.repository == 'gururaajar/rdkservices'
+        if: github.repository == 'rdkcentral/rdkservices'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
