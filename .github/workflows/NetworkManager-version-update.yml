@@ -18,10 +18,13 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Check if first commit
+      - name: Determine if first commit in PR
         id: first_commit_check
         run: |
-          COMMIT_COUNT=$(git rev-list --count HEAD ^$(git merge-base HEAD versionauto))
+          # Get the base branch for the pull request or default to main if not in a PR context
+          BASE_BRANCH=${{ github.event.pull_request.base.ref || 'versionauto' }}
+          # Get the number of commits in the current branch that are not in the base branch
+          COMMIT_COUNT=$(git rev-list --count HEAD ^$(git merge-base HEAD origin/${BASE_BRANCH}))
           echo "COMMIT_COUNT=${COMMIT_COUNT}" >> $GITHUB_ENV
 
       - name: Increment version if first commit
