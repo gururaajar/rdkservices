@@ -18,65 +18,35 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Fetch all branches
-        run: git fetch --all
-
-      - name: Determine if new commit
-        id: commit_check
+     - name: Fetch all branches and tags
         run: |
-          # File to store the last processed commit hash
-          STATE_FILE=".github/last_commit_hash.txt"
-          
-          # Get the latest commit hash
-          LATEST_COMMIT_HASH=$(git rev-parse HEAD)
-          echo "LATEST_COMMIT_HASH=${LATEST_COMMIT_HASH}"
+          git fetch --all
+          git fetch --tags
 
-          # Check if the state file exists
-          if [ -f $STATE_FILE ]; then
-            LAST_COMMIT_HASH=$(cat $STATE_FILE)
-            echo "LAST_COMMIT_HASH=${LAST_COMMIT_HASH}"
-          else
-            LAST_COMMIT_HASH=""
-          fi
+      - name: Get the latest commit hash
+        id: get_latest_commit
+        run: echo "LATEST_COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
-          # Check if the commit hash has changed
-          if [ "$LATEST_COMMIT_HASH" != "$LAST_COMMIT_HASH" ]; then
-            echo "IS_NEW_COMMIT=true" >> $GITHUB_ENV
+      - name: Check for existing tag
+        id: check_tag
+        run: |
+          if git rev-parse "refs/tags/version-update-${LATEST_COMMIT_HASH}" >/dev/null 2>&1; then
+            echo "IS_AMEND=true" >> $GITHUB_ENV
           else
-            echo "IS_NEW_COMMIT=false" >> $GITHUB_ENV
+            echo "IS_AMEND=false" >> $GITHUB_ENV
           fi
 
       - name: Increment version if first commit
-        if: env.IS_NEW_COMMIT == 'true'
+        if: env.IS_AMEND == 'false'
         run: python NetworkManager/NetworkManager-version-update.py
 
       - name: Commit version update
-        if: env.IS_NEW_COMMIT == 'true'
+        if: env.IS_AMEND == 'false'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add NetworkManager/CMakeLists.txt docs/api/NetworkManagerPlugin.md
           git commit -m "CI: Incrementing the version number"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Update last processed commit hash
-        if: env.IS_NEW_COMMIT == 'true'
-        run: |
-          echo $LATEST_COMMIT_HASH > .github/last_commit_hash.txt
-          git add .github/last_commit_hash.txt
-          git commit -m "ci: update last processed commit hash"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Update last processed commit hash
-        if: env.IS_NEW_COMMIT == 'true'
-        run: |
-          echo $LATEST_COMMIT_HASH > .github/last_commit_hash.txt
-          git add .github/last_commit_hash.txt
-          git commit -m "ci: update last processed commit hash"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
