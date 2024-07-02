@@ -12,13 +12,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for all branches
 
       - name: Set up Python (needed for script execution)
         uses: actions/setup-python@v3
         with:
           python-version: '3.x'
 
-     - name: Fetch all branches and tags
+      - name: Fetch all branches and tags
         run: |
           git fetch --all
           git fetch --tags
