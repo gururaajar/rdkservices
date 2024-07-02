@@ -18,15 +18,23 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Filter changes
+        id: filter_changes
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            folder:
+              - 'NetworkManager/**'  # Replace with the path to your specific folder
+
       - name: Output repository name for debugging
         run: echo "The repository is ${{ github.repository }}"
 
       - name: Increment version if first commit
-        if: github.repository == 'rdkcentral/rdkservices'  # Replace with the owner and repository name
+        if: steps.filter_changes.outputs.folder == 'true' && github.repository == 'gururaajar/rdkservices'  # Replace with the owner and repository name
         run: python NetworkManager/NetworkManager-version-update.py
 
       - name: Commit version update
-        if: github.repository == 'rdkcentral/rdkservices'
+        if: steps.filter_changes.outputs.folder == 'true' && github.repository == 'gururaajar/rdkservices'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
