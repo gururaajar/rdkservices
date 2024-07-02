@@ -18,21 +18,28 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Determine if first commit in PR
-        id: first_commit_check
+      - name: Determine if new commit
+        id: commit_check
         run: |
-          # Get the base branch for the pull request or default to main if not in a PR context
+          # Determine the base branch
           BASE_BRANCH=${{ github.event.pull_request.base.ref || 'versionauto' }}
-          # Get the number of commits in the current branch that are not in the base branch
-          COMMIT_COUNT=$(git rev-list --count HEAD ^$(git merge-base HEAD origin/${BASE_BRANCH}))
+          echo "BASE_BRANCH=${BASE_BRANCH}"
+          # Find the point where the current branch diverged from the base branch
+          MERGE_BASE=$(git merge-base HEAD origin/${BASE_BRANCH})
+          echo "MERGE_BASE=${MERGE_BASE}"
+          # Count the number of commits from that point
+          COMMIT_COUNT=$(git rev-list --count HEAD ^${MERGE_BASE})
           echo "COMMIT_COUNT=${COMMIT_COUNT}" >> $GITHUB_ENV
+          # Check if the current commit is already in the base branch
+          COMMIT_EXISTS=$(git branch --contains HEAD | grep -q ${BASE_BRANCH} && echo "true" || echo "false")
+          echo "COMMIT_EXISTS=${COMMIT_EXISTS}" >> $GITHUB_ENV
 
       - name: Increment version if first commit
-        if: env.COMMIT_COUNT == '1'
+        if: env.COMMIT_EXISTS == 'false'
         run: python NetworkManager/NetworkManager-version-update.py
 
       - name: Commit version update
-        if: env.COMMIT_COUNT == '1'
+        if: env.COMMIT_EXISTS == 'false'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
