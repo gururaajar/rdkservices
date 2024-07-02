@@ -70,3 +70,13 @@ jobs:
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update last processed commit hash
+        if: env.IS_NEW_COMMIT == 'true'
+        run: |
+          echo $LATEST_COMMIT_HASH > .github/last_commit_hash.txt
+          git add .github/last_commit_hash.txt
+          git commit -m "ci: update last processed commit hash"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
