@@ -150,7 +150,7 @@ namespace WPEFramework
 
                 void onIPAddressChange(const string interface, const bool isAcquired, const bool isIPv6, const string ipAddress) override
                 {
-                    NMLOG_TRACE("%s", __FUNCTION__);
+                    NMLOG_TRACE("GURU : Entering %s", __FUNCTION__);
                     JsonObject params;
 #ifdef ENABLE_LEGACY_NSM_SUPPORT
                     JsonObject legacyParams;
@@ -176,6 +176,7 @@ namespace WPEFramework
                     params["ipAddress"] = ipAddress;
                     params["isIPv6"] = isIPv6;
                     _parent.Notify("onIPAddressChange", params);
+                    NMLOG_TRACE("GURU : Exiting %s", __FUNCTION__);
                 }
 
                 void onActiveInterfaceChange(const string prevActiveInterface, const string currentActiveinterface) override

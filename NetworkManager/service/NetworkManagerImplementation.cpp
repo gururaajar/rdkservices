@@ -471,11 +471,13 @@ namespace WPEFramework
         void NetworkManagerImplementation::ReportIPAddressChangedEvent(const string& interface, bool isAcquired, bool isIPv6, const string& ipAddress)
         {
             LOG_ENTRY_FUNCTION();
+            NMLOG_TRACE("GURU : Entering %s", __FUNCTION__);
             _notificationLock.Lock();
             for (const auto callback : _notificationCallbacks) {
                 callback->onIPAddressChange(interface, isAcquired, isIPv6, ipAddress);
             }
             _notificationLock.Unlock();
+            NMLOG_TRACE("GURU : Exiting %s", __FUNCTION__);
         }
 
         void NetworkManagerImplementation::ReportActiveInterfaceChangedEvent(const string prevActiveInterface, const string currentActiveinterface)
