@@ -386,6 +386,7 @@ namespace WPEFramework
         void NetworkManagerInternalEventHandler(const char *owner, IARM_EventId_t eventId, void *data, size_t len)
         {
             LOG_ENTRY_FUNCTION();
+            NMLOG_TRACE("GURU : Entering event handler =%s", __FUNCTION__ );
             if (_instance)
             {
  //               ::_instance->Event();
@@ -481,6 +482,7 @@ namespace WPEFramework
             }
             else
                 NMLOG_WARNING("WARNING - cannot handle IARM events without a Network plugin instance!");
+            NMLOG_TRACE("GURU : Exiting event handler =%s", __FUNCTION__ );
         }
 
         void NetworkManagerImplementation::platform_init()
